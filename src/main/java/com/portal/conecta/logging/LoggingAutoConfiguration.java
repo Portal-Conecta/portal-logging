@@ -7,6 +7,22 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplicat
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 
+/**
+ * Autoconfiguration da biblioteca {@code portal-logging}.
+ *
+ * <p>Registra automaticamente os filtros e beans necessários quando a biblioteca
+ * está no classpath do serviço consumidor. Todo bean pode ser substituído
+ * registrando uma implementação própria — o {@code @ConditionalOnMissingBean}
+ * garante que a lib não sobrescreve customizações do serviço.</p>
+ *
+ * <p>Para desabilitar completamente:</p>
+ * <pre>{@code
+ * portal:
+ *   observability:
+ *     logging:
+ *       enabled: false
+ * }</pre>
+ */
 @AutoConfiguration
 @ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 @ConditionalOnProperty(
