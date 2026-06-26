@@ -48,4 +48,10 @@ public class LoggingAutoConfiguration {
         return new AccessLogFilter(userIdResolver, loggingProperties);
     }
 
+    @Bean
+    @ConditionalOnMissingBean
+    public CorrelationIdProvider correlationIdProvider() {
+        return new CorrelationIdProvider();
+    }
+
 }
