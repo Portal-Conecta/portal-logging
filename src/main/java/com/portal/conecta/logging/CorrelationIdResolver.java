@@ -1,7 +1,5 @@
 package com.portal.conecta.logging;
 
-import jakarta.servlet.http.HttpServletRequest;
-
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -10,19 +8,17 @@ public class CorrelationIdResolver {
     private static final Pattern VALID_PATTERN = Pattern.compile("^[A-Za-z0-9._:-]+$");
 
     /**
-     * Resolve o correlation ID para a requisição corrente.
+     * Resolve o correlation ID a partir de um valor de header ja extraido.
      *
-     * @param request    requisição HTTP de origem.
-     * @param headerName nome do header a ser lido.
-     * @param maxLength  comprimento máximo aceito para o valor do header.
-     * @return valor do header se válido, ou um UUID gerado automaticamente.
+     * @param candidate  valor recebido no header.
+     * @param headerName nome do header configurado.
+     * @param maxLength  comprimento maximo aceito para o valor do header.
+     * @return valor do header se valido, ou um UUID gerado automaticamente.
      */
-    public String resolve(HttpServletRequest request, String headerName, int maxLength) {
+    public String resolve(String candidate, String headerName, int maxLength) {
         if (headerName == null || headerName.isBlank()) {
             return UUID.randomUUID().toString();
         }
-
-        String candidate = request.getHeader(headerName);
 
         if (isValid(candidate, maxLength)) {
             return candidate;
@@ -42,5 +38,4 @@ public class CorrelationIdResolver {
 
         return VALID_PATTERN.matcher(value).matches();
     }
-
 }

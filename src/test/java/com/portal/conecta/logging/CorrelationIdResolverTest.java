@@ -1,13 +1,10 @@
 package com.portal.conecta.logging;
 
-import jakarta.servlet.http.HttpServletRequest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class CorrelationIdResolverTest {
 
@@ -22,45 +19,33 @@ class CorrelationIdResolverTest {
     }
 
     @Test
-    @DisplayName("deve preservar correlation ID válido recebido no header")
+    @DisplayName("deve preservar correlation ID valido recebido no header")
     void shouldPreserveValidCorrelationId() {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getHeader(HEADER_NAME)).thenReturn("hub-test-123");
-
-        String result = resolver.resolve(request, HEADER_NAME, MAX_LENGTH);
+        String result = resolver.resolve("hub-test-123", HEADER_NAME, MAX_LENGTH);
 
         assertThat(result).isEqualTo("hub-test-123");
     }
 
     @Test
-    @DisplayName("deve gerar UUID quando header está ausente")
+    @DisplayName("deve gerar UUID quando header esta ausente")
     void shouldGenerateUuidWhenHeaderIsAbsent() {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getHeader(HEADER_NAME)).thenReturn(null);
-
-        String result = resolver.resolve(request, HEADER_NAME, MAX_LENGTH);
+        String result = resolver.resolve(null, HEADER_NAME, MAX_LENGTH);
 
         assertThat(result).matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
     }
 
     @Test
-    @DisplayName("deve gerar UUID quando header está vazio")
+    @DisplayName("deve gerar UUID quando header esta vazio")
     void shouldGenerateUuidWhenHeaderIsBlank() {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getHeader(HEADER_NAME)).thenReturn("   ");
-
-        String result = resolver.resolve(request, HEADER_NAME, MAX_LENGTH);
+        String result = resolver.resolve("   ", HEADER_NAME, MAX_LENGTH);
 
         assertThat(result).matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
     }
 
     @Test
-    @DisplayName("deve gerar UUID quando header tem caractere inválido")
+    @DisplayName("deve gerar UUID quando header tem caractere invalido")
     void shouldGenerateUuidWhenHeaderHasInvalidCharacter() {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getHeader(HEADER_NAME)).thenReturn("invalid id!");
-
-        String result = resolver.resolve(request, HEADER_NAME, MAX_LENGTH);
+        String result = resolver.resolve("invalid id!", HEADER_NAME, MAX_LENGTH);
 
         assertThat(result).matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
     }
@@ -68,10 +53,7 @@ class CorrelationIdResolverTest {
     @Test
     @DisplayName("deve gerar UUID quando header ultrapassa 128 caracteres")
     void shouldGenerateUuidWhenHeaderExceedsMaxLength() {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getHeader(HEADER_NAME)).thenReturn("a".repeat(129));
-
-        String result = resolver.resolve(request, HEADER_NAME, MAX_LENGTH);
+        String result = resolver.resolve("a".repeat(129), HEADER_NAME, MAX_LENGTH);
 
         assertThat(result).matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
     }
@@ -79,22 +61,17 @@ class CorrelationIdResolverTest {
     @Test
     @DisplayName("deve preservar correlation ID com exatamente 128 caracteres")
     void shouldPreserveCorrelationIdWithExactlyMaxLength() {
-        HttpServletRequest request = mock(HttpServletRequest.class);
         String value = "a".repeat(128);
-        when(request.getHeader(HEADER_NAME)).thenReturn(value);
 
-        String result = resolver.resolve(request, HEADER_NAME, MAX_LENGTH);
+        String result = resolver.resolve(value, HEADER_NAME, MAX_LENGTH);
 
         assertThat(result).isEqualTo(value);
     }
 
     @Test
-    @DisplayName("deve aceitar caracteres válidos: ponto, underline, dois-pontos e hífen")
+    @DisplayName("deve aceitar caracteres validos: ponto, underline, dois-pontos e hifen")
     void shouldAcceptValidSpecialCharacters() {
-        HttpServletRequest request = mock(HttpServletRequest.class);
-        when(request.getHeader(HEADER_NAME)).thenReturn("hub.core:service-001_v2");
-
-        String result = resolver.resolve(request, HEADER_NAME, MAX_LENGTH);
+        String result = resolver.resolve("hub.core:service-001_v2", HEADER_NAME, MAX_LENGTH);
 
         assertThat(result).isEqualTo("hub.core:service-001_v2");
     }
