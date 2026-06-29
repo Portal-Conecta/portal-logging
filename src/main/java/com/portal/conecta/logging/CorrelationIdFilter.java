@@ -37,7 +37,7 @@ public class CorrelationIdFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String correlationId = correlationIdResolver.resolve(
-                request,
+                request.getHeader(loggingProperties.getCorrelationHeader()),
                 loggingProperties.getCorrelationHeader(),
                 loggingProperties.getMaxCorrelationIdLength()
         );

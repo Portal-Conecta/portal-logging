@@ -1,1 +1,2 @@
 com.portal.conecta.logging.LoggingAutoConfiguration
+com.portal.conecta.logging.ReactiveLoggingAutoConfiguration
