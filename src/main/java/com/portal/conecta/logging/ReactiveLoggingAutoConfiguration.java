@@ -1,5 +1,7 @@
 package com.portal.conecta.logging;
 
+import io.micrometer.tracing.Tracer;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -49,9 +51,10 @@ public class ReactiveLoggingAutoConfiguration {
     @ConditionalOnMissingBean
     public ReactiveAccessLogWebFilter reactiveAccessLogWebFilter(
             LoggingProperties loggingProperties,
-            ReactiveRouteResolver reactiveRouteResolver
+            ReactiveRouteResolver reactiveRouteResolver,
+            ObjectProvider<Tracer> tracer
     ) {
-        return new ReactiveAccessLogWebFilter(loggingProperties, reactiveRouteResolver);
+        return new ReactiveAccessLogWebFilter(loggingProperties, reactiveRouteResolver, tracer.getIfAvailable());
     }
 
     @Bean
