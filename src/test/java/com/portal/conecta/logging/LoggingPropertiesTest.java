@@ -3,6 +3,8 @@ package com.portal.conecta.logging;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 class LoggingPropertiesTest {
@@ -15,6 +17,8 @@ class LoggingPropertiesTest {
         assertThat(properties.getCorrelationHeader()).isEqualTo("X-Correlation-Id");
         assertThat(properties.getMaxCorrelationIdLength()).isEqualTo(128);
         assertThat(properties.isAccessLogEnabled()).isTrue();
+        assertThat(properties.getAccessLogIgnoredPaths())
+                .containsExactly("/actuator/health", "/actuator/health/**", "/actuator/prometheus");
     }
 
     @Test
@@ -42,6 +46,15 @@ class LoggingPropertiesTest {
         properties.setAccessLogEnabled(false);
 
         assertThat(properties.isAccessLogEnabled()).isFalse();
+    }
+
+    @Test
+    @DisplayName("deve atualizar accessLogIgnoredPaths via setter")
+    void shouldUpdateAccessLogIgnoredPathsViaSetter() {
+        LoggingProperties properties = new LoggingProperties();
+        properties.setAccessLogIgnoredPaths(List.of("/internal/health"));
+
+        assertThat(properties.getAccessLogIgnoredPaths()).containsExactly("/internal/health");
     }
 
     @Test
