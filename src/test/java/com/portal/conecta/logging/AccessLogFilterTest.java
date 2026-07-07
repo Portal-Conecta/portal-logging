@@ -151,11 +151,54 @@ class AccessLogFilterTest {
         Mockito.verify(resolver, Mockito.never()).resolve();
     }
 
+    @Test
+    @DisplayName("deve ignorar access log de healthcheck com sucesso")
+    void shouldIgnoreSuccessfulHealthcheckAccessLog() throws Exception {
+        buildMockMvc().perform(get("/actuator/health/readiness")).andExpect(status().isOk());
+
+        assertThat(filter.captured).isEmpty();
+        Mockito.verify(userIdResolver, Mockito.never()).resolve();
+    }
+
+    @Test
+    @DisplayName("deve ignorar access log de prometheus com sucesso")
+    void shouldIgnoreSuccessfulPrometheusAccessLog() throws Exception {
+        buildMockMvc().perform(get("/actuator/prometheus")).andExpect(status().isOk());
+
+        assertThat(filter.captured).isEmpty();
+        Mockito.verify(userIdResolver, Mockito.never()).resolve();
+    }
+
+    @Test
+    @DisplayName("deve registrar access log de actuator quando status for erro")
+    void shouldLogActuatorAccessLogWhenStatusIsError() throws Exception {
+        Mockito.when(userIdResolver.resolve()).thenReturn(Optional.empty());
+        buildMockMvc().perform(get("/actuator/health/failing")).andExpect(status().isInternalServerError());
+
+        assertThat(filter.captured.get(LoggingContextKeys.PATH)).isEqualTo("/actuator/health/failing");
+        assertThat(filter.captured.get(LoggingContextKeys.STATUS)).isEqualTo("500");
+    }
+
     @RestController
     static class StubController {
         @GetMapping("/stub")
         ResponseEntity<Void> stub() {
             return ResponseEntity.ok().build();
+        }
+
+        @GetMapping("/actuator/health/readiness")
+        ResponseEntity<Void> health() {
+            return ResponseEntity.ok().build();
+        }
+
+        @GetMapping("/actuator/prometheus")
+        ResponseEntity<Void> prometheus() {
+            return ResponseEntity.ok().build();
+        }
+
+        @GetMapping("/actuator/health/failing")
+        ResponseEntity<Void> failingHealth() {
+            return ResponseEntity.internalServerError().build();
         }
     }
 }

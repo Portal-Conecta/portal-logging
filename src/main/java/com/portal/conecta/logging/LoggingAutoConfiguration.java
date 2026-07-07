@@ -1,10 +1,12 @@
 package com.portal.conecta.logging;
 
+import io.micrometer.tracing.Tracer;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.context.annotation.Bean;
 
 /**
@@ -59,9 +61,10 @@ public class LoggingAutoConfiguration {
     @ConditionalOnMissingBean
     public AccessLogFilter accessLogFilter(
             UserIdResolver userIdResolver,
-            LoggingProperties loggingProperties
+            LoggingProperties loggingProperties,
+            ObjectProvider<Tracer> tracer
     ) {
-        return new AccessLogFilter(userIdResolver, loggingProperties);
+        return new AccessLogFilter(userIdResolver, loggingProperties, tracer.getIfAvailable());
     }
 
     @Bean
