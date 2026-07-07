@@ -2,6 +2,9 @@ package com.portal.conecta.logging;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Propriedades de configuração do subsistema de logging do Portal Conecta.
  *
@@ -22,6 +25,9 @@ public class LoggingProperties {
     private String correlationHeader = "X-Correlation-Id";
     private int maxCorrelationIdLength = 128;
     private boolean accessLogEnabled = true;
+    private List<String> accessLogIgnoredPaths = new ArrayList<>(
+            List.of("/actuator/health", "/actuator/health/**", "/actuator/prometheus")
+    );
 
     public LoggingProperties() {
     }
@@ -54,6 +60,14 @@ public class LoggingProperties {
 
     public void setAccessLogEnabled(boolean accessLogEnabled) {
         this.accessLogEnabled = accessLogEnabled;
+    }
+
+    public List<String> getAccessLogIgnoredPaths() {
+        return accessLogIgnoredPaths;
+    }
+
+    public void setAccessLogIgnoredPaths(List<String> accessLogIgnoredPaths) {
+        this.accessLogIgnoredPaths = accessLogIgnoredPaths != null ? accessLogIgnoredPaths : new ArrayList<>();
     }
 
 }
